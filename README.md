@@ -1,4 +1,4 @@
-# Synaptics touchpad one finger scrolling
+# Synaptics Touchpad One Finger Scrolling
 
 A CLI utility make it possible to scroll with one finger. Execellent combination with ThinkPad TrackPoint.
 
