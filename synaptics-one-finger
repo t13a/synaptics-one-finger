@@ -1,0 +1,72 @@
+#!/bin/bash
+
+set -euo pipefail
+
+source "${BASH_SOURCE[0]}.conf"
+
+function check() {
+    local pattern=
+
+    for opt in "${SYNCLIENT_OPTS[@]}" "${SYNCLIENT_OPTS_ONE_FINGER[@]}"
+    do
+        [ -n "${pattern}" ] && pattern+='\|'
+        pattern+="^\\s*${opt/=/\\s*=\\s*}$"
+    done
+
+    local actual="$(synclient | grep "${pattern}" | wc -l)"
+    local expect="$((${#SYNCLIENT_OPTS[@]} + ${#SYNCLIENT_OPTS_ONE_FINGER[@]}))"
+
+    test $actual -eq $expect
+}
+
+function help() {
+    cat << EOF
+${0} [OPTION]...
+
+Options:
+  -1      set one finger (disable move cursor)
+  -2      set two finger
+  -c      check one finger
+  -h      show help
+  -t      toggle one/two finger
+EOF
+}
+
+function set_one_finger() {
+    synclient "${SYNCLIENT_OPTS[@]}" "${SYNCLIENT_OPTS_ONE_FINGER[@]}"
+}
+
+function set_two_finger() {
+    synclient "${SYNCLIENT_OPTS[@]}" "${SYNCLIENT_OPTS_TWO_FINGER[@]}"
+}
+
+function toggle() {
+    check && set_two_finger || set_one_finger
+}
+
+SUBCOMMAND=help
+
+while getopts '12cht' OPT
+do
+    case "${OPT}" in
+        1)
+            SUBCOMMAND=set_one_finger
+            ;;
+        2)
+            SUBCOMMAND=set_two_finger
+            ;;
+        c)
+            SUBCOMMAND=check
+            ;;
+        h)
+            SUBCOMMAND=help
+            ;;
+        t)
+            SUBCOMMAND=toggle
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+"${SUBCOMMAND}" "${@}"
