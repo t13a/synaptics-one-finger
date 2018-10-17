@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Synaptics One Finger
+Exec=/usr/local/bin/synaptics-one-finger -1
+X-GNOME-Autostart-enabled=true
